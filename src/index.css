@@ -14,15 +14,6 @@ body, :root {
   overflow: hidden;
 }
 
-@font-face {
-  font-family: 'NeueHaasGroteskDisplay';
-  src: url('/fonts/NeueHaasGrotesk-DisplayBold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-
 
 
 .title{

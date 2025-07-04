@@ -18,8 +18,8 @@ A real-time visualization of gravitational lensing around a Schwarzschild black 
 - Real-time GPU rendering using GLSL fragment shaders
 - Backward ray tracing from screen pixels through Schwarzschild geometry
 - Accretion disk distortion and photon ring visualization
-
-
+- Added music to give depth over the simulation
+- Public folder has various deep field images, you can try changing the background to see how it looks.
 
 ## Tech Stack
 
@@ -31,7 +31,8 @@ A real-time visualization of gravitational lensing around a Schwarzschild black 
 
 
 ##  Acknowledgments
-- Shader adapted from a shader on shader toys by aroussel
+- Shader adapted from a shader on shadertoys by aroussel
+- Deepfield images by Hubble and JWST
 - Music credits : MelodySheep 
 
  📜 License
