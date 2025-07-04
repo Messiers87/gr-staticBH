@@ -9,7 +9,7 @@ A real-time visualization of gravitational lensing around a Schwarzschild black 
 
 ##  Live Demo
 
-[👉 View it live](https://your-live-demo-url.com) (hosted on Vercel)
+[👉 View it live](https://static-blackhole.vercel.app/) (hosted on Vercel)
 
 
 
