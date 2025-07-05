@@ -1,10 +1,33 @@
 import * as THREE from 'three';
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree} from '@react-three/fiber'
+import { useEffect } from 'react';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 // components
 import ShaderPlane from './components/ShaderPlane';
 import MusicPlayer from './components/MusicPlayer';
+import ViewCounter from './components/Counter';
 
+
+
+function ResponsivePerspectiveCamera({ hfov = 2.3, distance = 5 }) {
+  const { camera, size } = useThree();
+
+  useEffect(() => {
+    const aspect = size.width / size.height;
+
+    // Convert HFOV to VFOV using aspect ratio
+    const hfovRad = hfov;
+    const vfovRad = 2 * Math.atan(Math.tan(hfovRad / 2) / aspect);
+    const vfovDeg = THREE.MathUtils.radToDeg(vfovRad);
+
+    camera.fov = vfovDeg;
+    camera.aspect = aspect;
+    camera.position.set(0, 0, distance);
+    camera.updateProjectionMatrix();
+  }, [camera, size, hfov, distance]);
+
+  return null;
+}
 function App() {
 
   return (
@@ -42,7 +65,7 @@ function App() {
       <Canvas style={{ height: '100vh', width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         {/* <OrbitControls /> */}
 
-        <PerspectiveCamera />
+        <ResponsivePerspectiveCamera hfov={2.3} distance={5} />
         {/* <PerspectiveCamera
           makeDefault
           position={[-1.62, 5, 8.9]}
@@ -54,6 +77,8 @@ function App() {
         <ShaderPlane />
 
       </Canvas>
+      <ViewCounter slug="blackhole-visualization" />
+
 
     </>
   )

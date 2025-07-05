@@ -2,35 +2,42 @@ import { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 
-export default function ShaderPlane({texture}) {
+export default function ShaderPlane({ texture }) {
   const meshRef = useRef();
   const { size } = useThree();
+  const isMobile = size.width < 768; 
 
   const uniforms = useMemo(() => {
     return {
       iTime: { value: 0 },
       iResolution: { value: new THREE.Vector2(size.width, size.height) },
       iTexture: { value: texture },
+      hfov: { value: isMobile ? 1.4 : 2.3 },
+      dist: { value: isMobile ? 5.0 : 5.0},
+      aspect: { value: isMobile ? size.width / size.height : 1.78 },
     };
-  }, [texture]);
+  }, [texture, size, isMobile]);
 
   useEffect(() => {
     uniforms.iResolution.value.set(size.width, size.height);
-  }, [size, uniforms]);
+    uniforms.aspect.value = isMobile ? size.width / size.height : 1.78;
+    uniforms.hfov.value = isMobile ? 1.4 : 2.3;
+    uniforms.dist.value = isMobile ? 3.0 : 5.0;
+  }, [size, uniforms, isMobile]);
 
   useMemo(() => {
-    new THREE.TextureLoader().load('/deep1.png', (texture) => {
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      texture.flipY = false;
-      uniforms.iTexture.value = texture;
+    new THREE.TextureLoader().load('/deep1.png', (loadedTexture) => {
+      loadedTexture.wrapS = loadedTexture.wrapT = THREE.RepeatWrapping;
+      loadedTexture.flipY = false;
+      uniforms.iTexture.value = loadedTexture;
       console.log('Texture loaded');
     });
   }, [uniforms]);
 
   useFrame((state) => {
     uniforms.iTime.value = state.clock.getElapsedTime();
-    if (texture){
-        uniforms.iTexture.value = texture;
+    if (texture) {
+      uniforms.iTexture.value = texture;
     }
   });
 
@@ -46,13 +53,15 @@ export default function ShaderPlane({texture}) {
   );
 }
 
-
 const fragmentShader = `
 #define PI 3.1415926
 
 uniform float iTime;
 uniform vec2 iResolution;
 uniform sampler2D iTexture;
+uniform float hfov;
+uniform float dist;
+uniform float aspect;
 varying vec2 vUv;
 
 float checkerAA(vec2 p){
@@ -63,10 +72,7 @@ float checkerAA(vec2 p){
 
 void main(){
   vec2 fragCoord = gl_FragCoord.xy;
-  vec2 uv = (1.78 * fragCoord - iResolution.xy) / iResolution.x;
-
-  float hfov = 2.3;
-  float dist = 5.0;
+  vec2 uv = (aspect * fragCoord - iResolution.xy) / iResolution.x;
 
   vec3 vel = normalize(vec3(1.0, -uv * tan(hfov / 2.0)));
   vec3 pos = vec3(-dist, 0.0, 0.0);
@@ -87,9 +93,8 @@ void main(){
   float theta1 = 1.0 - atan(length(vel.xy), vel.z) / PI;
   vec2 UV = vec2(phi1, theta1) + vec2(iTime * 0.005, 0.0);
 
-  // Sample the texture using distorted UV
-  vec2 texUV = fract(UV); // Ensure wrapping
-  texUV.y = 1.0 - texUV.y; // Optional: flip vertically if needed
+  vec2 texUV = fract(UV);
+  texUV.y = 1.0 - texUV.y;
 
   vec3 textColor = texture2D(iTexture, texUV).rgb;
 
@@ -108,5 +113,3 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-
-
